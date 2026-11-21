@@ -185,39 +185,47 @@ class UserInfoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blue.shade50,
+                radius: 58,
+                backgroundColor: Colors.blue.shade100,
                 backgroundImage: user.photoURL != null && user.photoURL!.isNotEmpty
                     ? NetworkImage(user.photoURL!)
                     : null,
                 child: user.photoURL == null || user.photoURL!.isEmpty
-                    ? const Icon(Icons.account_circle, size: 100, color: Colors.blue)
+                    ? const Icon(Icons.person, size: 64, color: Colors.blue)
                     : null,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               const Text(
                 'Login Berhasil!',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 6),
+              Text(
+                user.displayName?.isNotEmpty == true ? user.displayName! : 'Pengguna Firebase',
+                style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 24),
               Card(
-                elevation: 4,
+                elevation: 3,
+                shadowColor: Colors.blue.withOpacity(0.15),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Nama: ${user.displayName?.isNotEmpty == true ? user.displayName : "Tidak ada nama"}',
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      Text('UID: ${user.uid}', 
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      Text('Email: ${user.email ?? "Tidak ada email"}'),
-                      const SizedBox(height: 8),
-                      Text('Email Terverifikasi: ${user.emailVerified ? "Ya" : "Tidak"}'),
-                      const SizedBox(height: 8),
-                      Text('Terakhir Login: ${user.metadata.lastSignInTime.toString()}'),
+                      _InfoRow(icon: Icons.email_outlined, label: 'Email', value: user.email ?? 'Tidak ada email'),
+                      const Divider(height: 24),
+                      _InfoRow(
+                        icon: user.emailVerified ? Icons.verified_outlined : Icons.info_outline,
+                        label: 'Status email',
+                        value: user.emailVerified ? 'Terverifikasi' : 'Belum terverifikasi',
+                      ),
+                      const Divider(height: 24),
+                      _InfoRow(
+                        icon: Icons.access_time,
+                        label: 'Terakhir login',
+                        value: user.metadata.lastSignInTime?.toLocal().toString() ?? '-',
+                      ),
                     ],
                   ),
                 ),
@@ -226,6 +234,35 @@ class UserInfoScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.icon, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Colors.blue, size: 22),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+              const SizedBox(height: 4),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
