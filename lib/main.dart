@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart'; 
 import 'firebase_options.dart';         
+import 'dart:math' as math;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _rememberLogin = true;
   String? _errorMessage;
 
   Future<void> _login() async {
@@ -78,10 +80,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      // Firebase Auth menyimpan status sesi secara persisten secara default.
+      // Jika opsi dihapus, langsung keluarkan sesi setelah autentikasi berhasil.
+      if (!_rememberLogin && credential.user != null) {
+        await FirebaseAuth.instance.signOut();
+      }
       // Jika berhasil, AuthWrapper otomatis mendeteksi perubahan stream
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -107,8 +114,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      body: SafeArea(
-        child: Center(
+      body: Stack(
+        children: [
+          const Positioned.fill(child: _LoginIllustration()),
+          SafeArea(
+            child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: ConstrainedBox(
@@ -173,6 +183,18 @@ class _LoginScreenState extends State<LoginScreen> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
                             ),
                           ),
+                          const SizedBox(height: 6),
+                          CheckboxListTile(
+                            value: _rememberLogin,
+                            onChanged: _isLoading
+                                ? null
+                                : (value) => setState(() => _rememberLogin = value ?? false),
+                            contentPadding: EdgeInsets.zero,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: const Text('Ingat saya', style: TextStyle(fontSize: 14)),
+                            subtitle: const Text('Tetap masuk di perangkat ini', style: TextStyle(fontSize: 12)),
+                            activeColor: const Color(0xFF356AE6),
+                          ),
                           const SizedBox(height: 24),
                           SizedBox(
                             height: 54,
@@ -199,10 +221,73 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+class _LoginIllustration extends StatefulWidget {
+  const _LoginIllustration();
+
+  @override
+  State<_LoginIllustration> createState() => _LoginIllustrationState();
+}
+
+class _LoginIllustrationState extends State<_LoginIllustration>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 5),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final lift = math.sin(_controller.value * math.pi) * 14;
+        return Stack(
+          children: [
+            Positioned(
+              top: -110 + lift,
+              right: -95,
+              child: _blob(300, const Color(0xFFDCE8FF)),
+            ),
+            Positioned(
+              bottom: -150 - lift,
+              left: -100,
+              child: _blob(340, const Color(0xFFE4F3F4)),
+            ),
+            Positioned(
+              top: 105 + lift,
+              right: 38,
+              child: Icon(Icons.auto_awesome, size: 28, color: Colors.blue.shade200),
+            ),
+            Positioned(
+              bottom: 110 + lift,
+              right: 58,
+              child: Icon(Icons.circle, size: 12, color: Colors.teal.shade200),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _blob(double size, Color color) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      );
 }
 
 /// Halaman Informasi User
