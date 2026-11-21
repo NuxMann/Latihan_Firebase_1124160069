@@ -336,9 +336,10 @@ class UserInfoScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              Text(
-                user.displayName?.isNotEmpty == true ? user.displayName! : 'Pengguna Firebase',
-                style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+              _LedNameDisplay(
+                name: user.displayName?.isNotEmpty == true
+                    ? user.displayName!
+                    : 'Pengguna Firebase',
               ),
               const SizedBox(height: 24),
               Card(
@@ -372,6 +373,119 @@ class UserInfoScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _LedNameDisplay extends StatefulWidget {
+  final String name;
+
+  const _LedNameDisplay({required this.name});
+
+  @override
+  State<_LedNameDisplay> createState() => _LedNameDisplayState();
+}
+
+class _LedNameDisplayState extends State<_LedNameDisplay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Duration(milliseconds: (widget.name.length * 180).clamp(2200, 9000)),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const ledColors = [
+      Color(0xFFFF4D6D), // merah
+      Color(0xFFFFB84D), // jingga
+      Color(0xFFFFFF5C), // kuning
+      Color(0xFF62FF8E), // hijau
+      Color(0xFF55E7FF), // biru muda
+      Color(0xFF6790FF), // biru
+      Color(0xFFD66BFF), // ungu
+    ];
+
+    return Container(
+      height: 54,
+      width: double.infinity,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: const Color(0xFF080D0A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF26352B)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x22000000), blurRadius: 12, offset: Offset(0, 5)),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _LedGridPainter()),
+          ),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) => LayoutBuilder(
+              builder: (context, constraints) {
+                // Tambahkan ruang untuk huruf lebar dan letter spacing agar
+                // karakter terakhir tidak terpotong pada nama yang panjang.
+                final textWidth = (widget.name.length * 16.0 + 36).clamp(190.0, 700.0);
+                final x = constraints.maxWidth -
+                    _controller.value * (constraints.maxWidth + textWidth);
+                return Transform.translate(
+                  offset: Offset(x, 0),
+                  child: SizedBox(
+                    width: textWidth,
+                    height: constraints.maxHeight,
+                    child: Center(
+                      child: Text(
+                        widget.name.toUpperCase(),
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          foreground: Paint()
+                            ..shader = const LinearGradient(
+                              colors: ledColors,
+                            ).createShader(const Rect.fromLTWH(0, 0, 700, 54)),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2.0,
+                          fontFamily: 'monospace',
+                          shadows: const [
+                            Shadow(color: Color(0xFF62FF8E), blurRadius: 8),
+                            Shadow(color: Color(0xFF55E7FF), blurRadius: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LedGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = const Color(0x1F68FF8A);
+    const spacing = 7.0;
+    for (double y = 4; y < size.height; y += spacing) {
+      for (double x = 4; x < size.width; x += spacing) {
+        canvas.drawCircle(Offset(x, y), 1, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _InfoRow extends StatelessWidget {
