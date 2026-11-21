@@ -184,8 +184,17 @@ class UserInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Icon(Icons.account_circle, size: 100, color: Colors.blue),
-                const SizedBox(height: 24),
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.blue.shade50,
+                backgroundImage: user.photoURL != null && user.photoURL!.isNotEmpty
+                    ? NetworkImage(user.photoURL!)
+                    : null,
+                child: user.photoURL == null || user.photoURL!.isEmpty
+                    ? const Icon(Icons.account_circle, size: 100, color: Colors.blue)
+                    : null,
+              ),
+              const SizedBox(height: 24),
               const Text(
                 'Login Berhasil!',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -198,6 +207,9 @@ class UserInfoScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text('Nama: ${user.displayName?.isNotEmpty == true ? user.displayName : "Tidak ada nama"}',
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
                       Text('UID: ${user.uid}', 
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
