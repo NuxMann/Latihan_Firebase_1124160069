@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "234061212118",
+    "project_id": "flutter-project-fahry",
+    "storage_bucket": "flutter-project-fahry.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234061212118:android:8a81a253d7c5362ffddc77",
+        "android_client_info": {
+          "package_name": "com.example.latihan_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "234061212118-mf1nv7nr5jclc5s16vg51tt17hbklgj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF53oIqxNGxah7h3IBVwT7NyGP7jFT6Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234061212118-mf1nv7nr5jclc5s16vg51tt17hbklgj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234061212118:android:269cf72f025900f6fddc77",
+        "android_client_info": {
+          "package_name": "com.example.login_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "234061212118-mf1nv7nr5jclc5s16vg51tt17hbklgj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF53oIqxNGxah7h3IBVwT7NyGP7jFT6Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234061212118-mf1nv7nr5jclc5s16vg51tt17hbklgj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
