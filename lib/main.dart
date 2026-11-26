@@ -1,33 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; 
-import 'firebase_options.dart';         
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:login_firebase/fcm_token_card.dart';
+import 'package:login_firebase/firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; 
 import 'dart:math' as math;
 
-void main() async {
+import 'package:login_firebase/notification_service.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Inisialisasi Firebase
-  // Inisialisasi menggunakan opsi yang di-generate sesuai platform
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //   await Firebase.initializeApp();
 
+  // Register background message handler
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+
+  // Initialize notification service
+  await NotificationService.init();
+
+  // Run application after initialization completes
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Firebase Auth Simple',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // Menggunakan StreamBuilder untuk mendeteksi status login
       home: const AuthWrapper(),
     );
   }
@@ -291,17 +303,81 @@ class _LoginIllustrationState extends State<_LoginIllustration>
 }
 
 /// Halaman Informasi User
-class UserInfoScreen extends StatelessWidget {
+
+/// Halaman Informasi User + Kontrol FCM Topic
+class UserInfoScreen extends StatefulWidget {
   final User user;
 
-  const UserInfoScreen({Key? key, required this.user}) : super(key: key);
+  const UserInfoScreen({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
+
+  @override
+  State<UserInfoScreen> createState() => _UserInfoScreenState();
+}
+
+class _UserInfoScreenState extends State<UserInfoScreen> {
+  bool? _isSubscribed;
+  bool _isLoading = false;
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
   }
 
+  /// Subscribe / Unsubscribe topic kelas.
+  Future<void> _runTopicAction({required bool subscribe}) async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (subscribe) {
+        await NotificationService.subscribeToKelas();
+      } else {
+        await NotificationService.unsubscribeFromKelas();
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _isSubscribed = subscribe;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            subscribe
+                ? 'Berhasil subscribe topic kelas!'
+                : 'Berhasil unsubscribe topic kelas!',
+          ),
+          backgroundColor: subscribe ? Colors.green : Colors.orange,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengubah subscription: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = widget.user;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard User'),
@@ -310,10 +386,11 @@ class UserInfoScreen extends StatelessWidget {
             icon: const Icon(Icons.logout),
             onPressed: _logout,
             tooltip: 'Logout',
-          )
+          ),
         ],
       ),
-      body: Center(
+
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -323,45 +400,223 @@ class UserInfoScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 58,
                 backgroundColor: Colors.blue.shade100,
-                backgroundImage: user.photoURL != null && user.photoURL!.isNotEmpty
-                    ? NetworkImage(user.photoURL!)
-                    : null,
+                backgroundImage:
+                    user.photoURL != null && user.photoURL!.isNotEmpty
+                        ? NetworkImage(user.photoURL!)
+                        : null,
                 child: user.photoURL == null || user.photoURL!.isEmpty
-                    ? const Icon(Icons.person, size: 64, color: Colors.blue)
+                    ? const Icon(
+                        Icons.person,
+                        size: 64,
+                        color: Colors.blue,
+                      )
                     : null,
               ),
+
               const SizedBox(height: 20),
+
               const Text(
                 'Login Berhasil!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+
               const SizedBox(height: 6),
+
               _LedNameDisplay(
                 name: user.displayName?.isNotEmpty == true
                     ? user.displayName!
                     : 'Pengguna Firebase',
               ),
+
               const SizedBox(height: 24),
+
+              // INFORMASI USER
               Card(
                 elevation: 3,
                 shadowColor: Colors.blue.withOpacity(0.15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      _InfoRow(icon: Icons.email_outlined, label: 'Email', value: user.email ?? 'Tidak ada email'),
-                      const Divider(height: 24),
                       _InfoRow(
-                        icon: user.emailVerified ? Icons.verified_outlined : Icons.info_outline,
-                        label: 'Status email',
-                        value: user.emailVerified ? 'Terverifikasi' : 'Belum terverifikasi',
+                        icon: Icons.email_outlined,
+                        label: 'Email',
+                        value: user.email ?? 'Tidak ada email',
                       ),
+
                       const Divider(height: 24),
+
+                      _InfoRow(
+                        icon: user.emailVerified
+                            ? Icons.verified_outlined
+                            : Icons.info_outline,
+                        label: 'Status email',
+                        value: user.emailVerified
+                            ? 'Terverifikasi'
+                            : 'Belum terverifikasi',
+                      ),
+
+                      const Divider(height: 24),
+
                       _InfoRow(
                         icon: Icons.access_time,
                         label: 'Terakhir login',
-                        value: user.metadata.lastSignInTime?.toLocal().toString() ?? '-',
+                        value: user.metadata.lastSignInTime
+                                ?.toLocal()
+                                .toString() ??
+                            '-',
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const FcmTokenCard(),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // KONTROL FCM TOPIC
+              Card(
+                elevation: 3,
+                shadowColor: Colors.blue.withOpacity(0.15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.campaign_rounded,
+                            color: Colors.blue,
+                            size: 28,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Notifikasi Kelas',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const Text(
+                        'Kelola langganan notifikasi pengumuman '
+                        'untuk seluruh anggota kelas.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // STATUS SUBSCRIPTION
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: _isSubscribed == true
+                              ? Colors.green.shade50
+                              : _isSubscribed == false
+                                  ? Colors.orange.shade50
+                                  : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _isSubscribed == true
+                                  ? Icons.check_circle
+                                  : _isSubscribed == false
+                                      ? Icons.notifications_off
+                                      : Icons.help_outline,
+                              color: _isSubscribed == true
+                                  ? Colors.green
+                                  : _isSubscribed == false
+                                      ? Colors.orange
+                                      : Colors.grey,
+                            ),
+
+                            const SizedBox(width: 10),
+
+                            Expanded(
+                              child: Text(
+                                _isSubscribed == true
+                                    ? 'Subscribed'
+                                    : _isSubscribed == false
+                                        ? 'Unsubscribed'
+                                        : 'Status belum disinkronkan',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // TOMBOL SUBSCRIBE
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: _isLoading || _isSubscribed == true
+                              ? null
+                              : () => _runTopicAction(subscribe: true),
+                          icon: _isLoading && _isSubscribed != true
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.notifications_active),
+                          label: const Text('Subscribe Topic Kelas'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // TOMBOL UNSUBSCRIBE
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton.icon(
+                          onPressed: _isLoading || _isSubscribed == false
+                              ? null
+                              : () => _runTopicAction(subscribe: false),
+                          icon: const Icon(Icons.notifications_off),
+                          label: const Text('Unsubscribe Topic Kelas'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -374,6 +629,7 @@ class UserInfoScreen extends StatelessWidget {
     );
   }
 }
+
 
 class _LedNameDisplay extends StatefulWidget {
   final String name;
