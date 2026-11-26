@@ -6,9 +6,12 @@
 </p>
 
 <p align="center">
-  <img src="screenshots/tugas-1.png" width="80%" alt="Screenshot Tugas 1" />
+  <img src="screenshots/notifappon.jpeg" width="80%" alt="Screenshot Tugas 1" />
 </p>
 
+<p align="center">
+  <img src="screenshots/detailnotif.jpeg" width="80%" alt="Screenshot Tugas 1" />
+</p>
 ---
 
 
