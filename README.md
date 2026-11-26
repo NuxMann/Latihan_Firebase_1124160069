@@ -16,7 +16,7 @@
 
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE+%26+UNSUBSCRIBE+TOPIC" alt="Subscribe" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE" alt="Subscribe" />
 </p>
 
 <p align="center">
@@ -33,11 +33,11 @@
 
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE+%26+UNSUBSCRIBE+TOPIC" alt="Unsubscribe" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+UNSUBSCRIBE" alt="Unsubscribe" />
 </p>
 
 <p align="center">
-  <img src="screenshots/detailunsubs.jpeg" width="80%" alt="Screenshot Tugas 2" />
+  <img src="screenshots/notifunsubs.jpeg" width="80%" alt="Screenshot Tugas 2" />
 </p>
 ---
 
