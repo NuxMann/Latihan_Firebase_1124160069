@@ -36,6 +36,8 @@
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+UNSUBSCRIBE" alt="Unsubscribe" />
 </p>
 
+<p>Pada Unsubs Notif Tidak Akan Muncul Karena Sistem Di Setting Ketika Unsubscribe Notif Tidak Muncul</p>
+
 <p align="center">
   <img src="screenshots/notifunsubs.jpeg" width="80%" alt="Screenshot Tugas 2" />
 </p>
