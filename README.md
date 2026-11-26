@@ -16,13 +16,29 @@
 
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE+%26+UNSUBSCRIBE+TOPIC" alt="Subscribe dan Unsubscribe Topic" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE+%26+UNSUBSCRIBE+TOPIC" alt="Subscribe" />
 </p>
 
 <p align="center">
-  <img src="screenshots/tugas-2.png" width="80%" alt="Screenshot Tugas 2" />
+  <img src="screenshots/subscribe.jpeg" width="80%" alt="Screenshot Tugas 2" />
 </p>
 
+<p align="center">
+  <img src="screenshots/subscribenotif.jpeg" width="80%" alt="Screenshot Tugas 2" />
+</p>
+
+<p align="center">
+  <img src="screenshots/detailnotifsubs.jpeg" width="80%" alt="Screenshot Tugas 2" />
+</p>
+
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=650&height=45&lines=02.+SUBSCRIBE+%26+UNSUBSCRIBE+TOPIC" alt="Unsubscribe" />
+</p>
+
+<p align="center">
+  <img src="screenshots/detailunsubs.jpeg" width="80%" alt="Screenshot Tugas 2" />
+</p>
 ---
 
 
@@ -31,16 +47,9 @@
 </p>
 
 <p align="center">
-  <img src="screenshots/tugas-3.png" width="80%" alt="Screenshot Tugas 3" />
+  <img src="screenshots/imagenotif.jpeg" width="80%" alt="Screenshot Tugas 3" />
 </p>
 
 ---
 
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=20&duration=2500&pause=1000&color=00BFFF&center=true&vCenter=true&width=750&height=45&lines=04.+SAVE+FCM+TOKEN+TO+CLOUD+FIRESTORE" alt="Menyimpan FCM Token ke Cloud Firestore" />
-</p>
-
-<p align="center">
-  <img src="screenshots/tugas-4.png" width="80%" alt="Screenshot Tugas 4" />
-</p>
